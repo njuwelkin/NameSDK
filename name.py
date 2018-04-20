@@ -118,10 +118,10 @@ class NameHTTPClient(object):
         headers.update(self.basic_headers)
         return self._raw_request(method, uri, headers, body, self.host, self.port, self.force_tls)
 
-    def _http_get(self, uri, headers, body):
+    def http_get(self, uri, headers={}, body=""):
         return self._request("GET", uri, headers, body)
 
-    def _http_post(self, uri, headers, body):
+    def http_post(self, uri, headers={}, body=""):
         return self._request("POST", uri, headers, body)
 
 
@@ -134,27 +134,5 @@ class NameClient(NameHTTPClient):
                   timeout   = TIMEOUT,
                   force_tls = FORCE_TLS ):
         super(NameClient, self).__init__(username, token, host, port, timeout, force_tls)
-
-    def __getattr__(self, name):
-        return NameClient.UriElement(self, "/%s" % name)
-
-    class UriElement(object):
-        def __init__(self, client, path):
-            self.client = client
-            self.path = path
-
-        def __getattr__(self, name):
-            return NameClient.UriElement(self.client, "%s/%s" % (self.path, name))
-
-        def get(self, headers={}, body=""):
-            return self.client._http_get(self.path, headers, body)
-
-        def post(self, headers={}, body=""):
-            return self.client._http_post(self.path, headers, body)
-
-
-
-
-
 
 
