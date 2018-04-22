@@ -1,3 +1,4 @@
+from NameSDK.nameerror import *
 
 def parse_response(response, cls):
         if response.status != 200:

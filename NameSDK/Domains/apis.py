@@ -42,20 +42,15 @@ class Domains(object):
     #
     # Not tested
     #
-    def CreateDomain(self, body):
+    def CreateDomain(self, body_DomainPurchase):
         """
         CreateDomain purchases a new domain. Domains that are not regularly priced require the purchase_price field to be specified.
         See https://www.name.com/api-docs/Domains#CreateDomain
         """
-        class Result(Model):
-            domain	= ModelField(Domain)
-            order	= IntegerField()
-            totalPaid	= FloatField()
-
         body._check_essential()
 
-        response = self.client.http_post("/v4/domains", body=json.dumps(body))
-        return parse_response(response, Result)
+        response = self.client.http_post("/v4/domains", body=json.dumps(body_DomainPurchase))
+        return parse_response(response, DomainPurchaseResult)
 
     # Not tested
     def EnableAutorenew(self, domainName):
@@ -81,16 +76,69 @@ class Domains(object):
         return parse_response(response, Domain)
 
 
+    # not tested
+    def RenewDomain(self, domainName, body_DomainRenew):
+        """
+        RenewDomain will renew a domain. Purchase_price is required if the renewal is not regularly priced.
+        Endpoint:   POST /v4/domains/{domainName}:renew
+        Parameters:
+        	domainName,     string, DomainName is the domain name to disable autorenew for.
+        	body,		DomainRenew
+        		purchasePrice,	float64,	PurchasePrice is the amount to pay for the domain renewal. 
+        						If VAT tax applies, it will also be added automatically. 
+        						PurchasePrice is required if this is a premium domain.
+
+        		years,		int32,		Years is for how many years to renew the domain for. 
+        						Years defaults to 1 if not passed and cannot be more than 10.
+        		promoCode,	string,		PromoCode is not yet implemented.
+        """
+
+        body._check_essential()
+        response = self.client.http_post("/v4/domains/%s:renew" % domainName, json.dumps(body_DomainRenew))
+        return parse_response(response, DomainPurchaseResult)
+
+    def GetAuthCodeForDomain(self, domainName):
+        """
+        GetAuthCodeForDomain returns the Transfer Authorization Code for the domain.
+        Endpoint:   GET /v4/domains/{domainName}:getAuthCode
+        Parameters:
+        	domainName,	string,	DomainName is the domain name to retrieve the authorization code for.
+        """
+        class Result(Model):
+            authCode = StringField()
+    
+        response = self.client.http_get("/v4/domains/%s:getAuthCode" % domainName)
+        return parse_response(response, Result).authCode
+
+    # not implemented
+    def PurchasePrivacy(self, domainName, body):
+        pass
 
 
+    # not tested
+    def SetNameservers(self, domainName, body_NameServers):
+        """
+        SetNameservers will set the nameservers for the Domain.
+        Endpoint:   POST /v4/domains/{domainName}:setNameservers
+        Parameters:
+        	domainName,	string,		DomainName is the domain name to disable autorenew for.
+        	nameservers,	NameServers,	Namesevers is a list of the nameservers to set. 
+        					Nameservers should already be set up and hosting the zone 
+        					properly as some registries will verify before allowing the change.
+        """
+        body_NameServers._check_essential()
+        response = self.client.http_post("/v4/domains/%s:setNameservers" % domainName, json.dumps(body_NameServers))
+        return parse_response(response, Domain)
 
+    def SetContacts(self, domainName, body_Contacts):
+        body_Contacts._check_essential()
+        response = self.client.http_post("/v4/domains/%s:setContacts" % domainName, json.dumps(body_Contacts))
+        return parse_response(response, Domain)
 
-
-
-
-
-
-
-
+    #def LockDomain
+    #def UnlockDomain
+    #def CheckAvailability
+    #def Search
+    #def SearchStream
 
 

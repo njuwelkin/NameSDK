@@ -31,7 +31,7 @@ class Domain(Model):
     createDate		= StringField()
     renewalPrice	= FloatField()
 
-
+############################ Post body ###############################
 class DomainPurchase(Model):
     domain		= ModelField(Domain, notnull=True)
     purchasePrice	= FloatField(notnull=True)
@@ -39,4 +39,20 @@ class DomainPurchase(Model):
     years		= IntegerField()
     tldRequirements	= DictField()
     promoCode		= StringField()
+
+class DomainRenew(Model):
+    purchasePrice	= FloatField(notnull=True)
+    years		= IntegerField()
+    promoCode		= StringField()
+
+class NameServers(Model):
+    nameservers		= ListField(StringField())
+
+
+############################ Response body ###########################
+class DomainPurchaseResult(Model):
+    domain      = ModelField(Domain)
+    order       = IntegerField()
+    totalPaid   = FloatField()
+
 

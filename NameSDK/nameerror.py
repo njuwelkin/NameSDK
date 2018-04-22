@@ -1,5 +1,5 @@
 
-class NameError(Exception)
+class NameError(Exception):
     """ Base class for all errors
     """
     def __repr__(self):
