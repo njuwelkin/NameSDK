@@ -1,4 +1,4 @@
-from libs.models import *
+from NameSDK.libs.models import *
 
 class Contact(Model):
     firstName		= StringField()

@@ -28,10 +28,10 @@ class Model(dict):
 
     def __getattr__(self, key):
         if self.__class__.__mappings__.has_key(key):
-            try:
+            if self.has_key(key):
                 return self[key]
-            except KeyError:
-                raise AttributeError(r"'Model' object has no attribute '%s'" % key)
+            else:
+                return None
         else:
             raise AttributeError(r"'Model' object has no attribute '%s'" % key)
 

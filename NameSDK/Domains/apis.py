@@ -1,5 +1,6 @@
-from libs.models import *
-from Domains.models import *
+from NameSDK.libs.models import *
+from NameSDK.Domains.models import *
+from NameSDK.libs.utils import *
 
 class Domains(object):
     def __init__(self, httpclient):
@@ -22,17 +23,9 @@ class Domains(object):
             response = self.client.http_get("/v4/domains", headers)
         else:
             response = self.client.http_get("/v4/domains")
-        print response.__dict__
 
-        if response.status != 200:
-            raise NameHttpError(response)
+        return parse_response(response, Result)
 
-        try:
-            res = Result.from_json(response.body)
-        except Exception, description:
-            raise NameParseError(description, response.body)
-
-        return res.domains
 
     def GetDomain(self, domainName):
         """
@@ -44,16 +37,11 @@ class Domains(object):
 
         response = self.client.http_get("/v4/domains/%s" % domainName)
 
-        if response.status != 200:
-            raise NameHttpError(response)
+        return parse_response(response, Domain)
 
-        try:
-            res = Domain.from_json(response.body)
-        except Exception, description:
-            raise NameParseError(description, response.body)
-
-        return res
-
+    #
+    # Not tested
+    #
     def CreateDomain(self, body):
         """
         CreateDomain purchases a new domain. Domains that are not regularly priced require the purchase_price field to be specified.
@@ -65,13 +53,32 @@ class Domains(object):
             totalPaid	= FloatField()
 
         body._check_essential()
-        
 
+        response = self.client.http_post("/v4/domains", body=json.dumps(body))
+        return parse_response(response, Result)
 
+    # Not tested
+    def EnableAutorenew(self, domainName):
+        """
+        EnableAutorenew enables the domain to be automatically renewed when it gets close to expiring.
+        Endpoint:   POST /v4/domains/{domainName}:enableAutorenew
+        Parameters:
+        	domainName,	string,	DomainName is the domain name to enable autorenew for.
+        """
 
+        response = self.client.http_post("/v4/domains/%s:enableAutorenew" % domainName)
+        return parse_response(response, Domain)
 
+    def DisableAutorenew(self, domainName):
+        """
+        DisableAutorenew disables automatic renewals, thus requiring the domain to be renewed manually.
+        Endpoint:   POST /v4/domains/{domainName}:disableAutorenew
+        Parameters:
+        	domainName,	string,	DomainName is the domain name to disable autorenew for.
+        """
 
-
+        response = self.client.http_post("/v4/domains/%s:disableAutorenew" % domainName)
+        return parse_response(response, Domain)
 
 
 

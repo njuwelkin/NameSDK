@@ -1,14 +1,6 @@
-from models import *
+import settings
+from Domains.models import *
 
-class User(Model):
-    id = IntegerField(notnull=True)
-    name = StringField(notnull=True)
-    email = StringField()
-    password = StringField(notnull=True)
+test_str = '{"domainName":"biubiu.org","locked":true,"autorenewEnabled":true,"expireDate":"2020-12-14T05:06:50Z","createDate":"2012-12-14T05:06:50Z"}'
 
-u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
-print u._check_essential()
-u2 = User(id=12345, email='test@orm.org', password='my-pwd')
-# print u2._check_essential()	
-u3 = User(id=12345, name='Michael', password='my-pwd')
-print u3._check_essential()
+d = Domain.from_json(test_str)
