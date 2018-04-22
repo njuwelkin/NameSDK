@@ -76,7 +76,6 @@ class NameHTTPClient(object):
         #if timeout and sys.version_info >= (2, 6):
         #    params['timeout'] = timeout
 
-        print(params)
         if force_tls:
             return httplib.HTTPSConnection(**params)
         else:

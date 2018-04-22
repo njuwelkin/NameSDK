@@ -1,4 +1,5 @@
 from field import *
+import json
 
 class ModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
@@ -23,6 +24,7 @@ class Model(dict):
     __metaclass__ = ModelMetaclass
 
     def __init__(self, **kw):
+        print type(kw)
         super(Model, self).__init__(**kw)
 
     def __getattr__(self, key):
@@ -35,6 +37,9 @@ class Model(dict):
             raise AttributeError(r"'Model' object has no attribute '%s'" % key)
 
     def __setattr__(self, key, value):
+        self._set_attr(key, value)
+
+    def _set_attr(self, key, value):
         if self.__class__.__mappings__.has_key(key):
             if self.__class__.__mappings__[key].accept(value):
                 self[key] = value
@@ -43,15 +48,37 @@ class Model(dict):
         else:
             raise AttributeError(r"'Model' object has no attribute '%s'" % key)
 
+    
+
     def _check_essential(self):
         for key in self.__class__.__essentials__:
             if not self.has_key(key):
                 raise AttributeError(r"attribute '%s' is required." % key)
-        
 
-    # TODO: add a constructor from dict
+    @classmethod        
+    def from_json(cls, str):
+        d = json.loads(str)
+        return cls.from_dict(d)
+
+    @classmethod        
+    def from_dict(cls, d):
+        ins = cls()
+        for k, v in d.iteritems():
+            if cls.__mappings__.has_key(k):
+                tp = cls.__mappings__[k]
+                if tp.column_type != type([]) or (not isinstance(tp.itemType, ModelField)):
+                    ins._set_attr(k, v)
+                else:
+                    l = []
+                    if isinstance(v, type([])):
+                        for item in v:
+                            l.append(tp.itemType.column_type.from_dict(item))
+                            
+                    ins._set_attr(k, l)
+        return ins
+            
 
 class ModelField(Field):               # dict field
     def __init__(self, model_class, notnull=False):
         assert(issubclass(model_class, Model))
-        super(IntegerField, self).__init__(model_class, notnull)
+        super(ModelField, self).__init__(model_class, notnull)
