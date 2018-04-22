@@ -1,6 +1,6 @@
 from NameSDK.libs.models import *
-from NameSDK.Domains.models import *
 from NameSDK.libs.utils import *
+from NameSDK.Domains.models import *
 
 class Domains(object):
     def __init__(self, httpclient):

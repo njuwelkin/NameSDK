@@ -5,6 +5,8 @@ import os
 
 
 from Domains.apis import Domains
+from DNS.apis import DNS
 modules = {
-    "Domains": Domains
+    "Domains": Domains,
+    "DNS": DNS
 }
