@@ -31,3 +31,12 @@ class Domain(Model):
     createDate		= StringField()
     renewalPrice	= FloatField()
 
+
+class DomainPurchase(Model):
+    domain		= ModelField(Domain, notnull=True)
+    purchasePrice	= FloatField(notnull=True)
+    purchaseType	= StringField()
+    years		= IntegerField()
+    tldRequirements	= DictField()
+    promoCode		= StringField()
+

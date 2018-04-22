@@ -24,7 +24,6 @@ class Model(dict):
     __metaclass__ = ModelMetaclass
 
     def __init__(self, **kw):
-        print type(kw)
         super(Model, self).__init__(**kw)
 
     def __getattr__(self, key):
@@ -44,7 +43,7 @@ class Model(dict):
             if self.__class__.__mappings__[key].accept(value):
                 self[key] = value
             else:
-                raise AttributeError(r"'%s' is not valid to %s" % (value, self.__class__.__mappings__[key]))
+                raise AttributeError(r"'%s' is not valid to %s: %s" % (value, key, self.__class__.__mappings__[key]))
         else:
             raise AttributeError(r"'Model' object has no attribute '%s'" % key)
 
@@ -62,18 +61,26 @@ class Model(dict):
 
     @classmethod        
     def from_dict(cls, d):
+        #print cls.__name__
         ins = cls()
         for k, v in d.iteritems():
+            #print "%s, %s" % (k, v)
             if cls.__mappings__.has_key(k):
                 tp = cls.__mappings__[k]
-                if tp.column_type != type([]) or (not isinstance(tp.itemType, ModelField)):
+                if tp.column_type != type([]) and not isinstance(tp, ModelField):
                     ins._set_attr(k, v)
+                elif isinstance(tp, ModelField):
+                    ins._set_attr(k, tp.column_type.from_dict(v))
                 else:
                     l = []
                     if isinstance(v, type([])):
-                        for item in v:
-                            l.append(tp.itemType.column_type.from_dict(item))
-                            
+                        if isinstance(tp.itemType, ModelField):
+                            for item in v:
+                                l.append(tp.itemType.column_type.from_dict(item))
+                        else:
+                            for item in v:
+                                if tp.itemType.accept(item):
+                                    l.append(item)
                     ins._set_attr(k, l)
         return ins
             

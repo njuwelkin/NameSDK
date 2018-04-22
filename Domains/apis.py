@@ -3,7 +3,7 @@ from Domains.models import *
 
 class Domains(object):
     def __init__(self, httpclient):
-        self.httpclient = httpclient
+        self.client = httpclient
 
     def ListDomains(self, perPage=0, page=1):
         """
@@ -19,13 +19,71 @@ class Domains(object):
 
         if perPage != 0:
             headers = {"perPage": perPage, "page": page}
-            response = self.httpclient.http_get("/v4/domains", headers)
+            response = self.client.http_get("/v4/domains", headers)
         else:
-            response = self.httpclient.http_get("/v4/domains")
+            response = self.client.http_get("/v4/domains")
         print response.__dict__
 
         if response.status != 200:
             raise NameHttpError(response)
 
-        res = Result.from_json(response.body)
+        try:
+            res = Result.from_json(response.body)
+        except Exception, description:
+            raise NameParseError(description, response.body)
+
         return res.domains
+
+    def GetDomain(self, domainName):
+        """
+        GetDomain returns details about a specific domain
+        Endpoint:   GET /v4/domains/{domainName}
+        Parameters:
+        	domainName,	string,	DomainName is the domain to retrieve.
+        """
+
+        response = self.client.http_get("/v4/domains/%s" % domainName)
+
+        if response.status != 200:
+            raise NameHttpError(response)
+
+        try:
+            res = Domain.from_json(response.body)
+        except Exception, description:
+            raise NameParseError(description, response.body)
+
+        return res
+
+    def CreateDomain(self, body):
+        """
+        CreateDomain purchases a new domain. Domains that are not regularly priced require the purchase_price field to be specified.
+        See https://www.name.com/api-docs/Domains#CreateDomain
+        """
+        class Result(Model):
+            domain	= ModelField(Domain)
+            order	= IntegerField()
+            totalPaid	= FloatField()
+
+        body._check_essential()
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

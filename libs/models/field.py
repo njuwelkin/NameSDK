@@ -43,4 +43,6 @@ class ListField(Field):
 #                return False
 #        return True
 
-
+class DictField(Field):
+    def __init__(self, notnull=False):
+        super(DictField, self).__init__(type(1), notnull)
