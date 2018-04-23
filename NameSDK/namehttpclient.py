@@ -123,5 +123,9 @@ class NameHTTPClient(object):
     def http_post(self, uri, headers={}, body=""):
         return self._request("POST", uri, headers, body)
 
+    def http_put(self, uri, headers={}, body=""):
+        return self._request("PUT", uri, headers, body)
 
+    def http_delete(self, uri, headers={}, body=""):
+        return self._request("DELETE", uri, headers, body)
 

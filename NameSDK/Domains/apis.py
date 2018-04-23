@@ -47,7 +47,7 @@ class Domains(object):
         CreateDomain purchases a new domain. Domains that are not regularly priced require the purchase_price field to be specified.
         See https://www.name.com/api-docs/Domains#CreateDomain
         """
-        body._check_essential()
+        body_DomainPurchase._check_essential()
 
         response = self.client.http_post("/v4/domains", body=json.dumps(body_DomainPurchase))
         return parse_response(response, DomainPurchaseResult)
@@ -135,6 +135,7 @@ class Domains(object):
         response = self.client.http_post("/v4/domains/%s:setContacts" % domainName, json.dumps(body_Contacts))
         return parse_response(response, Domain)
 
+    # not implemented
     #def LockDomain
     #def UnlockDomain
     #def CheckAvailability
