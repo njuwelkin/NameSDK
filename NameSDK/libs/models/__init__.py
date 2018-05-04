@@ -9,13 +9,11 @@ class ModelMetaclass(type):
         essentials = []
         for k, v in attrs.iteritems():
             if isinstance(v, Field):
-                #print('Found mapping: %s==>%s' % (k, v))
                 mappings[k] = v
                 if v.notnull:
                     essentials.append(k)
         for k in mappings.iterkeys():
             attrs.pop(k)
-        attrs['__table__'] = name.lower()
         attrs['__mappings__'] = mappings
         attrs['__essentials__'] = essentials
         return super(ModelMetaclass,cls).__new__(cls, name, bases, attrs)
@@ -61,10 +59,8 @@ class Model(dict):
 
     @classmethod        
     def from_dict(cls, d):
-        #print cls.__name__
         ins = cls()
         for k, v in d.iteritems():
-            #print "%s, %s" % (k, v)
             if cls.__mappings__.has_key(k):
                 tp = cls.__mappings__[k]
                 if tp.column_type != type([]) and not isinstance(tp, ModelField):
